@@ -3,6 +3,7 @@
 // instead of the target type itself.
 // You can read more about it at https://doc.rust-lang.org/std/convert/trait.TryFrom.html
 use std::convert::{TryInto, TryFrom};
+use std::str::FromStr;
 
 #[derive(Debug)]
 struct Person {
@@ -10,7 +11,6 @@ struct Person {
     age: usize,
 }
 
-// I AM NOT DONE
 // Your task is to complete this implementation
 // in order for the line `let p = Person::try_from("Mark,20")` to compile
 // and return an Ok result of inner type Person.
@@ -28,6 +28,33 @@ struct Person {
 impl TryFrom<&str> for Person {
     type Error = String;
     fn try_from(s: &str) -> Result<Self, Self::Error> {
+        let mut split_s: Vec<&str> = [].to_vec();
+
+        if s.len() == 0 {
+            return Err("Broken".to_string())
+        }
+
+        if s.contains(",") {
+            split_s = s.split(",").collect();
+        } else {
+            return Err("Broken".to_string())
+        }
+
+        if split_s.len() < 2 {
+            return Err("Broken".to_string())
+        }
+        let name: String = split_s[0].to_string();
+
+        let age = match FromStr::from_str(split_s[1]){
+            Ok(age) => Ok(age),
+            Err(msg) => Err(msg),
+        };
+
+        match age {
+            Ok(valid_age) => Ok(Person { name: name, age: age.unwrap() }),
+            Err(msg) => Err(msg.to_string()),
+        }
+ 
     }
 }
 
